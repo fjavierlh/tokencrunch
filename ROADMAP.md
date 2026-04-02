@@ -1,36 +1,36 @@
 # Roadmap
 
-## Fase 1 — Proxy funcional (MVP)
-> El proxy arranca, reenvía requests a la API, y mide tokens.
+## Phase 1 — Functional proxy (MVP)
+> The proxy starts up, forwards requests to the API, and measures tokens.
 
-- [x] Estructura del proyecto y documentación base
-- [ ] Proxy HTTP con FastAPI que reenvía requests a upstream
-- [ ] Soporte SSE streaming passthrough
-- [ ] Token counting (antes/después) con métricas en logs
+- [x] Project structure and base documentation
+- [ ] HTTP proxy with FastAPI that forwards requests to upstream
+- [ ] SSE streaming passthrough support
+- [ ] Token counting (before/after) with metrics in logs
 - [ ] CLI: `tokencrunch start` / `tokencrunch stop`
 
-## Fase 2 — Capas lossless
-> Compresión sin riesgo de pérdida de calidad.
+## Phase 2 — Lossless layers
+> Compression with no risk of quality loss.
 
 - [ ] **Syntactic layer**: strip whitespace, comments, empty lines
 - [ ] **Serialization layer**: JSON minification, TOON conversion
 - [ ] **Dedup layer**: LTSC-style repeated sequence replacement
-- [ ] Config TOML con toggle por capa
-- [ ] Dashboard de métricas por capa (terminal)
+- [ ] TOML config with per-layer toggle
+- [ ] Per-layer metrics dashboard (terminal)
 
-## Fase 3 — Capas avanzadas
-> Compresión con ML y caché inteligente.
+## Phase 3 — Advanced layers
+> ML-based compression and smart caching.
 
-- [ ] **Semantic layer**: integración LLMLingua-2
+- [ ] **Semantic layer**: LLMLingua-2 integration
 - [ ] **Cache layer**: embedding-based semantic cache
-- [ ] Rate limiting configurable por capa
-- [ ] Tests de regresión de calidad
+- [ ] Configurable rate limiting per layer
+- [ ] Quality regression tests
 
-## Fase 4 — Producción
-> Listo para uso diario.
+## Phase 4 — Production
+> Ready for daily use.
 
-- [ ] Publicar en PyPI
-- [ ] Documentación completa
-- [ ] Benchmarks reproducibles
-- [ ] Integración probada con Claude Code, opencode, aider
+- [ ] Publish to PyPI
+- [ ] Complete documentation
+- [ ] Reproducible benchmarks
+- [ ] Tested integration with Claude Code, opencode, aider
 - [ ] GitHub Actions CI/CD
