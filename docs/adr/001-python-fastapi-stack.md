@@ -1,56 +1,56 @@
-# ADR-001: Python + FastAPI como stack principal
+# ADR-001: Python + FastAPI as the main stack
 
-**Estado:** Aceptado
-**Fecha:** 2026-04-02
+**Status:** Accepted
+**Date:** 2026-04-02
 
-## Contexto
+## Context
 
-Necesitamos elegir el lenguaje y framework para construir un proxy HTTP que
-intercepte llamadas a APIs de LLM y aplique compresión en tiempo real.
+We need to choose the language and framework to build an HTTP proxy that
+intercepts LLM API calls and applies compression in real time.
 
-Los requisitos clave son:
-- Baja latencia añadida (el proxy no debe ralentizar notablemente las llamadas)
-- Soporte para streaming SSE (Server-Sent Events), que es como Claude envía respuestas
-- Integración directa con LLMLingua-2 (librería Python de Microsoft)
-- Facilidad de contribución para la comunidad open-source
+Key requirements:
+- Low added latency (the proxy must not noticeably slow down calls)
+- SSE (Server-Sent Events) streaming support, which is how Claude sends responses
+- Direct integration with LLMLingua-2 (Microsoft's Python library)
+- Low barrier to contribution for the open-source community
 
-## Decisión
+## Decision
 
-Usamos **Python 3.12+** con **FastAPI** y **uvicorn** como servidor ASGI.
+We use **Python 3.12+** with **FastAPI** and **uvicorn** as the ASGI server.
 
-## Alternativas consideradas
+## Alternatives considered
 
-### Rust (como lessloss y RTK)
-- ✅ Máximo rendimiento, binario único sin dependencias
-- ❌ LLMLingua-2 es Python → requeriría FFI o subprocess, añadiendo complejidad
-- ❌ Barrera de entrada alta para contribuidores
-- ❌ Desarrollo más lento para un prototipo
+### Rust (like lessloss and RTK)
+- ✅ Maximum performance, single binary with no dependencies
+- ❌ LLMLingua-2 is Python → would require FFI or subprocess, adding complexity
+- ❌ High entry barrier for contributors
+- ❌ Slower development for a prototype
 
 ### TypeScript/Bun
-- ✅ Buen rendimiento, ecosistema npm rico
-- ❌ Mismo problema con LLMLingua-2 (necesitaría child process Python)
-- ❌ Ecosistema de ML/NLP mucho más débil que Python
+- ✅ Good performance, rich npm ecosystem
+- ❌ Same problem with LLMLingua-2 (would need a Python child process)
+- ❌ Much weaker ML/NLP ecosystem than Python
 
 ### Go
-- ✅ Buen rendimiento, binario único, bueno para proxies HTTP
-- ❌ Mismo problema con LLMLingua-2
-- ❌ Ecosistema ML limitado
+- ✅ Good performance, single binary, great for HTTP proxies
+- ❌ Same problem with LLMLingua-2
+- ❌ Limited ML ecosystem
 
-## Consecuencias
+## Consequences
 
-### Positivas
-- Integración nativa con LLMLingua-2, tree-sitter, y todo el ecosistema ML de Python
-- Baja barrera de contribución (Python es el lenguaje más popular)
-- FastAPI genera documentación OpenAPI automática para el proxy
-- uvicorn es async, manejando bien conexiones concurrentes y streaming
+### Positive
+- Native integration with LLMLingua-2, tree-sitter, and the full Python ML ecosystem
+- Low contribution barrier (Python is the most popular language)
+- FastAPI auto-generates OpenAPI documentation for the proxy
+- uvicorn is async, handling concurrent connections and streaming well
 
-### Negativas
-- Mayor consumo de memoria que Rust/Go (~50-100MB vs ~10MB)
-- Latencia ligeramente mayor (~5-20ms por request vs ~1ms en Rust)
-- Requiere Python instalado (no es un binario autocontenido)
-- El GIL de Python limita el paralelismo CPU-bound (mitigable con ProcessPoolExecutor)
+### Negative
+- Higher memory usage than Rust/Go (~50-100MB vs ~10MB)
+- Slightly higher latency (~5-20ms per request vs ~1ms in Rust)
+- Requires Python installed (not a self-contained binary)
+- Python's GIL limits CPU-bound parallelism (mitigable with ProcessPoolExecutor)
 
-### Mitigaciones
-- La latencia del proxy (~10ms) es despreciable vs la latencia del LLM (~1-5s)
-- Podemos empaquetar con PyInstaller o similar para distribución
-- Las capas CPU-intensivas (tree-sitter, LLMLingua) se ejecutan en process pool
+### Mitigations
+- Proxy latency (~10ms) is negligible compared to LLM latency (~1-5s)
+- We can package with PyInstaller or similar for distribution
+- CPU-intensive layers (tree-sitter, LLMLingua) run in a process pool

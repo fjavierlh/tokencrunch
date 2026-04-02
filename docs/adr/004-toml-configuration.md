@@ -1,43 +1,43 @@
-# ADR-004: TOML como formato de configuración
+# ADR-004: TOML as configuration format
 
-**Estado:** Aceptado
-**Fecha:** 2026-04-02
+**Status:** Accepted
+**Date:** 2026-04-02
 
-## Contexto
+## Context
 
-tokencrunch necesita un archivo de configuración para controlar qué capas están
-activas, sus parámetros, y la configuración del proxy.
+tokencrunch needs a configuration file to control which layers are active,
+their parameters, and the proxy settings.
 
-## Decisión
+## Decision
 
-Usamos **TOML** como formato de configuración (`tokencrunch.toml`).
+We use **TOML** as the configuration format (`tokencrunch.toml`).
 
-## Alternativas consideradas
+## Alternatives considered
 
 ### YAML
-- ✅ Muy popular en DevOps
-- ❌ Sintaxis ambigua (Norway problem: `NO` se interpreta como `false`)
-- ❌ Indentation-sensitive (propenso a errores)
-- ❌ Requiere librería externa en Python (PyYAML)
+- ✅ Very popular in DevOps
+- ❌ Ambiguous syntax (Norway problem: `NO` is interpreted as `false`)
+- ❌ Indentation-sensitive (error-prone)
+- ❌ Requires an external library in Python (PyYAML)
 
 ### JSON
-- ✅ Universal, sin librerías extra
-- ❌ No soporta comentarios (crítico para config files)
-- ❌ Verbose (llaves, comillas en keys)
+- ✅ Universal, no extra libraries
+- ❌ Does not support comments (critical for config files)
+- ❌ Verbose (braces, quoted keys)
 
 ### .env / environment variables
-- ✅ Simple, sin archivos extra
-- ❌ No soporta estructuras anidadas (layers.syntactic = true)
-- ❌ Difícil de versionar configuraciones complejas
+- ✅ Simple, no extra files
+- ❌ Does not support nested structures (layers.syntactic = true)
+- ❌ Hard to version complex configurations
 
-## Consecuencias
+## Consequences
 
-### Positivas
-- TOML está en la stdlib de Python 3.11+ (`import tomllib`)
-- Soporta comentarios, tipos claros, y anidamiento
-- Es el estándar de facto para config en Python (pyproject.toml)
-- Sintaxis simple y no ambigua
+### Positive
+- TOML is in the Python 3.11+ stdlib (`import tomllib`)
+- Supports comments, clear types, and nesting
+- De facto standard for config in Python (pyproject.toml)
+- Simple and unambiguous syntax
 
-### Negativas
-- Menos conocido que YAML/JSON para algunos desarrolladores
-- No soporta esquemas de validación nativos (usamos pydantic para validar)
+### Negative
+- Less known than YAML/JSON for some developers
+- No native schema validation (we use pydantic to validate)

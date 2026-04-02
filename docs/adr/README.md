@@ -1,27 +1,27 @@
 # Architecture Decision Records
 
-## ¿Qué es un ADR?
+## What is an ADR?
 
-Un ADR (Architecture Decision Record) documenta una decisión técnica importante
-del proyecto. Cada ADR explica:
+An ADR (Architecture Decision Record) documents an important technical decision
+in the project. Each ADR explains:
 
-- **Contexto**: ¿Qué problema teníamos?
-- **Decisión**: ¿Qué elegimos?
-- **Alternativas**: ¿Qué otras opciones consideramos?
-- **Consecuencias**: ¿Qué ganamos y qué sacrificamos?
+- **Context**: What problem did we have?
+- **Decision**: What did we choose?
+- **Alternatives**: What other options did we consider?
+- **Consequences**: What did we gain and what did we trade off?
 
-## Índice
+## Index
 
-| ADR | Título | Estado |
-|-----|--------|--------|
-| [001](001-python-fastapi-stack.md) | Python + FastAPI como stack principal | Aceptado |
-| [002](002-layered-pipeline-architecture.md) | Arquitectura de pipeline por capas | Aceptado |
-| [003](003-transparent-proxy-pattern.md) | Patrón de proxy HTTP transparente | Aceptado |
-| [004](004-toml-configuration.md) | TOML como formato de configuración | Aceptado |
+| ADR | Title | Status |
+|-----|-------|--------|
+| [001](001-python-fastapi-stack.md) | Python + FastAPI as the main stack | Accepted |
+| [002](002-layered-pipeline-architecture.md) | Layered pipeline architecture | Accepted |
+| [003](003-transparent-proxy-pattern.md) | Transparent HTTP proxy pattern | Accepted |
+| [004](004-toml-configuration.md) | TOML as configuration format | Accepted |
 
-## ¿Cuándo crear un nuevo ADR?
+## When to create a new ADR?
 
-Cuando tomes una decisión que:
-- Sea difícil de revertir
-- Afecte a múltiples partes del código
-- Otros desarrolladores puedan cuestionar legítimamente
+When you make a decision that:
+- Is hard to reverse
+- Affects multiple parts of the codebase
+- Other developers could legitimately question

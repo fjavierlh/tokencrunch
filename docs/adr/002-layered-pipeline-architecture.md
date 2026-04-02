@@ -1,25 +1,25 @@
-# ADR-002: Arquitectura de pipeline por capas
+# ADR-002: Layered pipeline architecture
 
-**Estado:** Aceptado
-**Fecha:** 2026-04-02
+**Status:** Accepted
+**Date:** 2026-04-02
 
-## Contexto
+## Context
 
-Existen múltiples técnicas de compresión de tokens (sintáctica, serialización,
-deduplicación, semántica, caché). Necesitamos decidir cómo combinarlas.
+There are multiple token compression techniques (syntactic, serialization,
+deduplication, semantic, cache). We need to decide how to combine them.
 
-## Decisión
+## Decision
 
-Cada técnica de compresión es una **capa independiente** con una interfaz común.
-Las capas se ejecutan en orden secuencial formando un pipeline. Cada capa puede
-activarse/desactivarse individualmente.
+Each compression technique is an **independent layer** with a common interface.
+Layers execute sequentially forming a pipeline. Each layer can be
+enabled/disabled individually.
 
 ```
 Request → [Syntactic] → [Serialize] → [Dedup] → [Semantic] → [Cache] → API
 Response ← [Syntactic] ← [Serialize] ← [Dedup] ←            ← [Cache] ← API
 ```
 
-### Interfaz de cada capa
+### Layer interface
 
 ```python
 class CompressionLayer(Protocol):
@@ -29,39 +29,39 @@ class CompressionLayer(Protocol):
     def get_stats(self) -> LayerStats: ...
 ```
 
-### Orden de ejecución
+### Execution order
 
-El orden importa y está fijado por diseño:
+The order matters and is fixed by design:
 
-1. **Syntactic** primero: transforma código/texto a forma mínima. Esto hace que
-   las capas posteriores trabajen con menos texto.
-2. **Serialize**: convierte estructuras de datos a formatos compactos.
-3. **Dedup**: detecta secuencias repetidas (más efectivo después de normalizar).
-4. **Semantic**: compresión ML (la más costosa en tiempo, se aplica al final).
-5. **Cache**: si todo el request ya se vio antes, se salta la API completamente.
+1. **Syntactic** first: transforms code/text to minimal form. This makes
+   subsequent layers work with less text.
+2. **Serialize**: converts data structures to compact formats.
+3. **Dedup**: detects repeated sequences (more effective after normalization).
+4. **Semantic**: ML compression (the most time-expensive, applied last).
+5. **Cache**: if the entire request has been seen before, the API is skipped entirely.
 
-## Alternativas consideradas
+## Alternatives considered
 
-### Monolito (todo en una función)
-- ❌ Imposible desactivar técnicas individuales
-- ❌ Difícil de testear y debuggear
-- ❌ No permite que el usuario ajuste el nivel de riesgo
+### Monolith (everything in one function)
+- ❌ Impossible to disable individual techniques
+- ❌ Hard to test and debug
+- ❌ Does not let the user adjust risk level
 
-### Plugin system dinámico (carga de plugins en runtime)
-- ✅ Máxima extensibilidad
-- ❌ Sobreingeniería para 5 capas conocidas
-- ❌ Añade complejidad de discovery, ordering, dependency resolution
+### Dynamic plugin system (runtime plugin loading)
+- ✅ Maximum extensibility
+- ❌ Over-engineering for 5 known layers
+- ❌ Adds complexity of discovery, ordering, and dependency resolution
 
-## Consecuencias
+## Consequences
 
-### Positivas
-- El usuario controla exactamente qué capas usar (risk management)
-- Cada capa se testea de forma aislada
-- Las métricas por capa permiten saber qué técnica aporta más ahorro
-- Fácil añadir nuevas capas sin tocar las existentes
+### Positive
+- The user controls exactly which layers to use (risk management)
+- Each layer is tested in isolation
+- Per-layer metrics show which technique contributes the most savings
+- Easy to add new layers without touching existing ones
 
-### Negativas
-- Overhead de pasar datos entre capas (copias de mensajes). Mitigable con
-  referencias/views.
-- El orden fijo puede no ser óptimo para todos los casos. Aceptamos esto como
-  trade-off por simplicidad.
+### Negative
+- Overhead of passing data between layers (message copies). Mitigable with
+  references/views.
+- The fixed order may not be optimal for all cases. We accept this as a
+  trade-off for simplicity.

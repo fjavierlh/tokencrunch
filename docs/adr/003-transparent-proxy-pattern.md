@@ -1,64 +1,64 @@
-# ADR-003: Patrón de proxy HTTP transparente
+# ADR-003: Transparent HTTP proxy pattern
 
-**Estado:** Aceptado
-**Fecha:** 2026-04-02
+**Status:** Accepted
+**Date:** 2026-04-02
 
-## Contexto
+## Context
 
-Necesitamos decidir cómo se integra tokencrunch con los coding assistants
-existentes (Claude Code, opencode, aider, etc.).
+We need to decide how tokencrunch integrates with existing coding assistants
+(Claude Code, opencode, aider, etc.).
 
-## Decisión
+## Decision
 
-tokencrunch funciona como un **proxy HTTP transparente** en localhost. El usuario
-solo necesita cambiar una variable de entorno:
+tokencrunch works as a **transparent HTTP proxy** on localhost. The user
+only needs to change one environment variable:
 
 ```bash
 export ANTHROPIC_BASE_URL=http://localhost:7420
 ```
 
-El proxy recibe las requests tal cual, aplica compresión, las reenvía al
-upstream real (api.anthropic.com), recibe la respuesta, la procesa, y la
-devuelve al cliente.
+The proxy receives requests as-is, applies compression, forwards them to the
+real upstream (api.anthropic.com), receives the response, processes it, and
+returns it to the client.
 
-## Alternativas consideradas
+## Alternatives considered
 
-### SDK wrapper (librería que envuelve la API)
+### SDK wrapper (library that wraps the API)
 ```python
 from tokencrunch import CompressedClient
 client = CompressedClient()  # wraps anthropic.Client
 ```
-- ✅ Control fino por mensaje
-- ❌ Requiere cambiar código del usuario
-- ❌ Necesita implementación por lenguaje (Python, TS, Rust...)
-- ❌ No funciona con herramientas CLI que no exponen su client
+- ✅ Fine-grained control per message
+- ❌ Requires changing user code
+- ❌ Needs per-language implementation (Python, TS, Rust...)
+- ❌ Does not work with CLI tools that don't expose their client
 
 ### Monkey-patching / import hook
-- ✅ Zero config para apps Python
-- ❌ Solo funciona con Python
-- ❌ Frágil, se rompe con actualizaciones de las librerías
+- ✅ Zero config for Python apps
+- ❌ Only works with Python
+- ❌ Fragile, breaks with library updates
 
 ### MCP Server
-- ✅ Integración nativa con Claude
-- ❌ El agente debe invocar la herramienta explícitamente
-- ❌ Añade tokens de overhead (tool definitions, tool calls)
-- ❌ No comprime el tráfico existente, solo añade herramientas
+- ✅ Native integration with Claude
+- ❌ The agent must invoke the tool explicitly
+- ❌ Adds overhead tokens (tool definitions, tool calls)
+- ❌ Does not compress existing traffic, only adds tools
 
-## Consecuencias
+## Consequences
 
-### Positivas
-- **Zero code changes**: funciona con CUALQUIER herramienta que soporte
-  custom base URL (Claude Code, opencode, aider, API directa)
-- Un solo proxy sirve para Python, TypeScript, Rust, curl, etc.
-- El usuario puede inspeccionar el tráfico (útil para debugging)
-- Fácil de desactivar: quitar la variable de entorno
+### Positive
+- **Zero code changes**: works with ANY tool that supports a
+  custom base URL (Claude Code, opencode, aider, direct API)
+- A single proxy serves Python, TypeScript, Rust, curl, etc.
+- The user can inspect traffic (useful for debugging)
+- Easy to disable: remove the environment variable
 
-### Negativas
-- Complejidad de manejar SSE streaming (hay que parsear y reensamblar chunks)
-- El proxy debe reenviar correctamente TODOS los headers de la API
+### Negative
+- Complexity of handling SSE streaming (chunks must be parsed and reassembled)
+- The proxy must correctly forward ALL API headers
   (anthropic-version, anthropic-beta, authorization, etc.)
-- En localhost usamos HTTP plano (no HTTPS), lo cual es seguro pero puede
-  confundir a algunas herramientas. Documentamos esto.
-- No podemos comprimir lo que no pasa por HTTP (e.g., archivos locales que
-  Claude Code lee directamente). Para eso sería necesario un hook CLI
-  complementario (futuro).
+- On localhost we use plain HTTP (not HTTPS), which is safe but may confuse
+  some tools. We document this.
+- We cannot compress what does not go through HTTP (e.g., local files that
+  Claude Code reads directly). A complementary CLI hook would be needed for
+  that (future work).
